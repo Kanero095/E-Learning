@@ -97,8 +97,7 @@
                         </a>
                     @endif
 
-                    <a href="https://kanero095.github.io/SMK-Negeri-1-BP-bangsa-Raja/"
-                        class="flex items-center space-x-2 mt-3 hover:text-blue-600" target="_blank">
+                    <a href="#" class="flex items-center space-x-2 mt-3 hover:text-blue-600" target="_blank">
                         <img src="{{ asset('Image/Icon/info.png') }}" class="w-6" alt="">
                         <span>Tentang Sekolah</span>
                     </a>
