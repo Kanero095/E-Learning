@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: ELEARNING
+    env: php
+    buildCommand: |
+      composer install --optimize-autoloader --no-dev
+    startCommand: |
+      php artisan serve --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: false
