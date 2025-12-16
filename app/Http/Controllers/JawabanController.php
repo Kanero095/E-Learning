@@ -10,6 +10,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Validator;
+use Cloudinary\Api\Upload\UploadApi;
 
 class JawabanController extends Controller
 {
@@ -42,8 +43,15 @@ class JawabanController extends Controller
         $jawab->slugJawaban = Str::random(24) . '_' . $siswa->nis . '_jawab_tugas_' . $tugas->tugas;
 
         if ($request->hasFile('jawabanpdf')) {
-            $filePath = 'Jawaban_' . $siswa->nis . '_' . $siswa->nameSiswa . '_Tugas_' . $tugas->tugas . '.pdf';
-            $jawab->jawabanpdf = $request->file('jawabanpdf')->storeAs($tugas->kode_mapel . '_' .$tugas->name_mapel . '/Tugas/Jawaban', $filePath);
+            $uploadedFile = (new UploadApi())->upload($request->file('jawabanpdf')->getRealPath(), [
+                'folder' => 'elearning/' . $tugas->kode_mapel . '_' . $tugas->name_mapel . '/Tugas/' . $tugas->tugas . '/Jawaban',
+                'public_id' => 'Jawaban_' . $siswa->nis . '_' . $siswa->nameSiswa,
+                'resource_type' => 'auto',
+                'type' => 'upload',
+            ]);
+
+            // Simpan URL Gambar ke Database
+            $jawab->jawabanpdf = ($uploadedFile['secure_url']);
         } else {
             $jawab->jawabanteks = $request->myeditorinstance;
         }
@@ -55,7 +63,7 @@ class JawabanController extends Controller
     public function editjawaban($slug)
     {
         $jawaban = jawaban::where('slugJawaban', $slug)->firstOrFail();
-        return view('elearning.form.jawaban.editjawaban', ['jawaban'=>$jawaban]);
+        return view('elearning.form.jawaban.editjawaban', ['jawaban' => $jawaban]);
     }
 
     public function updatejawaban($slug, Request $request)
@@ -64,8 +72,15 @@ class JawabanController extends Controller
         $siswa = siswa::where('email', Auth::user()->email)->firstOrFail();
 
         if ($request->hasFile('jawabanpdf')) {
-            $filePath = 'Jawaban_' . $siswa->nis . '_' . $siswa->nameSiswa . '_Tugas_' . $data->tugas . '.pdf';
-            $jawabanpdf = $request->file('jawabanpdf')->storeAs($data->kode_mapel . '_' .$data->name_mapel . '/Tugas/Jawaban', $filePath);
+            $uploadedFile = (new UploadApi())->upload($request->file('jawabanpdf')->getRealPath(), [
+                'folder' => 'elearning/' . $data->kode_mapel . '_' . $data->name_mapel . '/Tugas/' . $data->tugas . '/Jawaban',
+                'public_id' => 'Jawaban_' . $siswa->nis . '_' . $siswa->nameSiswa,
+                'resource_type' => 'auto',
+                'type' => 'upload',
+            ]);
+
+            // Simpan URL Gambar ke Database
+            $jawabanpdf = ($uploadedFile['secure_url']);
             $jawabanteks = null;
         } else {
             $jawabanteks = $request->myeditorinstance;
@@ -78,7 +93,7 @@ class JawabanController extends Controller
             'pengumpulan' => Carbon::now(),
             'nilai' => null,
         ]);
-        return redirect()->route('open-tugas', $slug=$data->slugTugas)->with('success', 'Jawaban anda berhasil diupdate!');
+        return redirect()->route('open-tugas', $slug = $data->slugTugas)->with('success', 'Jawaban anda berhasil diupdate!');
     }
 
     public function editnilai($slugJawaban)
@@ -111,8 +126,8 @@ class JawabanController extends Controller
     {
         $jawab = jawaban::where('slugJawaban', $slugJawaban)->firstOrFail();
 
-        $path = storage_path('app/private/' . $jawab->jawabanpdf);
-        // dd($path);
+        $path = $jawab->jawabanpdf;
+
         if (!file_exists($path)) {
             abort(404, 'File tidak ditemukan.');
         }

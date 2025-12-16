@@ -9,6 +9,7 @@ use App\Models\siswa;
 use App\Models\Tugas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Cloudinary\Api\Upload\UploadApi;
 
 class elearningController extends Controller
 {
@@ -61,9 +62,16 @@ class elearningController extends Controller
 
         $pertemuan->slug = $mapel->slug . '_Pertemuan_' . $nomorPertemuan;
 
-        $filePath = 'Pertemuan_' . $nomorPertemuan . '.pdf';
-        $materi = $request->file('materi')->storeAs($mapel->kode_mapel . '_' .$mapel->name_mapel . '/Materi', $filePath);
-        $pertemuan->materi = $materi;
+        $uploadedFile = (new UploadApi())->upload($request->file('materi')->getRealPath(), [
+            'folder' => 'elearning/' . $mapel->kode_mapel . '_' . $mapel->name_mapel . '/Materi/' . $nomorPertemuan,
+            'public_id' => 'Materi_Pertemuan_' . $nomorPertemuan,
+            'resource_type' => 'auto',
+            'type' => 'upload',
+        ]);
+
+        // Simpan URL Gambar ke Database
+        $pertemuan->materi = ($uploadedFile['secure_url']);
+
         $pertemuan->save();
 
         return redirect()->route('open-mapel', $mapel->slug)->with('success', 'Pertemuan berhasil ditambahkan!');
@@ -73,7 +81,7 @@ class elearningController extends Controller
     {
         $pertemuan = elearning::where('slug', $slug)->firstOrFail();
 
-        $path = storage_path('app/private/' . $pertemuan->materi);
+        $path = $pertemuan->materi;
 
         if (!file_exists($path)) {
             abort(404, 'File tidak ditemukan.');
@@ -98,7 +106,7 @@ class elearningController extends Controller
         if (Auth::user()->roles == 'guru') {
             $pertemuan = elearning::where('slug', $slug)->firstOrFail();
             $mapel = mapel::where('kode_mapel', $pertemuan->kode_mapel)->firstOrFail();
-            return view('elearning.form.editPertemuan', ['pertemuan'=>$pertemuan, 'mapel' => $mapel]);
+            return view('elearning.form.editPertemuan', ['pertemuan' => $pertemuan, 'mapel' => $mapel]);
         } else {
             return view('Pages.home');
         }
@@ -109,18 +117,26 @@ class elearningController extends Controller
         $pertemuan = elearning::where('slug', $slug)->firstOrFail();
         $mapel = mapel::where('kode_mapel', $pertemuan->kode_mapel)->firstOrFail();
 
-        if ($request->hasFile('materi')) {
-            $filePath = 'Pertemuan_' . $request->pertemuan . '.pdf';
-            $materi = $request->file('materi')->storeAs($mapel->kode_mapel . '_' .$pertemuan->name_mapel . '/Materi', $filePath);
-        } else {
-            $materi = $pertemuan->materi;
-        }
-
+        // penomoran pertemuan
         $nomorPertemuan = $request->pertemuan;
         while (elearning::where('pertemuan', $nomorPertemuan)->where('kode_mapel', $mapel->kode_mapel)->exists()) {
             $nomorPertemuan++;
         }
 
+        // upload to cloudinary
+        if ($request->hasFile('materi')) {
+            $uploadedFile = (new UploadApi())->upload($request->file('materi')->getRealPath(), [
+                'folder' => 'elearning/' . $mapel->kode_mapel . '_' . $mapel->name_mapel . '/Materi/' . $request->pertemuan,
+                'public_id' => 'Materi_Pertemuan_' . $request->pertemuan,
+                'resource_type' => 'auto',
+                'type' => 'upload',
+            ]);
+            $materi = ($uploadedFile['secure_url']);
+        } else {
+            $materi = $pertemuan->materi;
+        }
+
+        // update data
         $new_pertemuan = elearning::where('slug', $slug)->firstOrFail()->update([
             'kode_mapel' => $pertemuan->kode_mapel,
             'name_mapel' => $pertemuan->name_mapel,

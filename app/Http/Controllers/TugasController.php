@@ -10,6 +10,7 @@ use App\Models\siswa;
 use App\Models\Tugas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Cloudinary\Api\Upload\UploadApi;
 
 class TugasController extends Controller
 {
@@ -43,8 +44,15 @@ class TugasController extends Controller
         $tugas->slug = $mapel->slug . '_tugas_' . $nomorTugas;
 
         if ($request->hasFile('soalpdf')) {
-            $filePath = 'Tugas_' . $nomorTugas . '.pdf';
-            $tugas->soalpdf = $request->file('soalpdf')->storeAs($mapel->kode_mapel . '_' .$mapel->name_mapel . '/Tugas', $filePath);
+            $uploadedFile = (new UploadApi())->upload($request->file('soalpdf')->getRealPath(), [
+                'folder' => 'elearning/' . $mapel->kode_mapel . '_' . $mapel->name_mapel . '/Tugas/' . $nomorTugas,
+                'public_id' => 'Tugas_Pertemuan_' . $nomorTugas,
+                'resource_type' => 'auto',
+                'type' => 'upload',
+            ]);
+
+            // Simpan URL Gambar ke Database
+            $tugas->soalpdf = ($uploadedFile['secure_url']);
         } else {
             $tugas->soalteks = $request->myeditorinstance;
         }
@@ -79,7 +87,7 @@ class TugasController extends Controller
             $mapel = mapel::where('kode_mapel', $data->kode_mapel)->firstOrFail();
             $tugas = tugas::where('slug', $slug)->firstOrFail()->delete();
 
-            $slug = $mapel->slug . '_tugas_' . $data->tugas ;
+            $slug = $mapel->slug . '_tugas_' . $data->tugas;
             // dd($slug);
             $jawaban = jawaban::where('slugTugas', $slug)->delete();
             return redirect()->route('open-mapel', $mapel->slug)->with('success', 'Tugas ' . $data->tugas . ' & Seluruh jawaban pada tugas ini berhasil dihapus!');
@@ -104,22 +112,28 @@ class TugasController extends Controller
         $data = Tugas::where('slug', $slug)->firstOrFail();
         $mapel = mapel::where('kode_mapel', $data->kode_mapel)->firstOrFail();
 
-        if ($request->hasFile('soalpdf')) {
-            $filePath = 'Tugas_' . $request->tugas . '.pdf';
-            $soalpdf = $request->file('soalpdf')->storeAs($mapel->kode_mapel . '_' .$data->name_mapel . '/Tugas', $filePath);
-            $soalteks = null;
-        } elseif($data->soalpdf == true) {
-            $soalpdf = $data->soalpdf;
-            $soalteks = null;
-        }
-         else {
-            $soalteks = $request->myeditorinstance;
-            $soalpdf = null;
-        }
-
         $nomorTugas = $request->tugas;
         while (Tugas::where('tugas', $nomorTugas)->where('kode_mapel', $mapel->kode_mapel)->exists()) {
             $nomorTugas++;
+        }
+
+        if ($request->hasFile('soalpdf')) {
+            $uploadedFile = (new UploadApi())->upload($request->file('soalpdf')->getRealPath(), [
+                'folder' => 'elearning/' . $mapel->kode_mapel . '_' . $mapel->name_mapel . '/Tugas/' . $nomorTugas,
+                'public_id' => 'Tugas_Pertemuan_' . $nomorTugas,
+                'resource_type' => 'auto',
+                'type' => 'upload',
+            ]);
+
+            // Simpan URL Gambar ke Database
+            $soalpdf = ($uploadedFile['secure_url']);
+            $soalteks = null;
+        } elseif ($data->soalpdf == true) {
+            $soalpdf = $data->soalpdf;
+            $soalteks = null;
+        } else {
+            $soalteks = $request->myeditorinstance;
+            $soalpdf = null;
         }
 
         $slugTugas = $mapel->slug . '_tugas_' . $nomorTugas;
@@ -142,7 +156,7 @@ class TugasController extends Controller
     {
         $tugas = Tugas::where('slug', $slug)->firstOrFail();
 
-        $path = storage_path('app/private/' . $tugas->soalpdf);
+        $path = $tugas->soalpdf;
 
         if (!file_exists($path)) {
             abort(404, 'File tidak ditemukan.');
