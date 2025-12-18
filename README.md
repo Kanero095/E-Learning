@@ -6,7 +6,7 @@
 </p>
 
 <p align="center" style="font-weight:bold; font-size:17px;">
-    Link Projek : <a href="https://e-learning-3g3k.onrender.com/">https://sibice.onrender.com/</a>
+    Link Projek : <a href="https://e-learning-3g3k.onrender.com/">https://e-learning-3g3k.onrender.com/</a>
 </p>
 
 # About Projek
