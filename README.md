@@ -5,6 +5,10 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
+<p align="center" style="font-weight:bold; font-size:17px;">
+    Link Projek : <a href="https://e-learning-3g3k.onrender.com/">https://sibice.onrender.com/</a>
+</p>
+
 # About Projek
 
 ## 📌 English Version
