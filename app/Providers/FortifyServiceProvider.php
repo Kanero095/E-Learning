@@ -44,21 +44,22 @@ class FortifyServiceProvider extends ServiceProvider
             //     ->orWhere('nupt', $login)
             //     ->first();
 
-            if(User::where('email', $login)->exists()){
+            $user = null;
+            if (User::where('email', $login)->exists()) {
                 $user = User::where('email', $login)->first();
-            } elseif (User::where('nis', $login)->exists()){
-                $emailSiswa = User::where('nis', $login)->firstOrFail();
-                $user = User::where('email', $emailSiswa->email)->first();
-            } elseif (User::where('nuptk', $login)->exists()){
-                $emailGuru = User::where('nuptk', $login)->firstOrFail();
-                $user = User::where('email', $emailGuru->email)->first();
+            } elseif (User::where('nis', $login)->exists()) {
+                $emailSiswa = User::where('nis', $login)->first();
+                $user = $emailSiswa ? User::where('email', $emailSiswa->email)->first() : null;
+            } elseif (User::where('nuptk', $login)->exists()) {
+                $emailGuru = User::where('nuptk', $login)->first();
+                $user = $emailGuru ? User::where('email', $emailGuru->email)->first() : null;
             }
 
             if ($user && Hash::check($password, $user->password)) {
                 return $user;
             }
-            dd($user);
-            // return null;
+
+            return null;
         });
 
 

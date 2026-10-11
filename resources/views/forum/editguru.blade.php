@@ -1,94 +1,102 @@
-<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-
-<main-layout>
-    <title>Edit Data Guru | E-Learning</title>
+<x-main-layout>
     <x-sidebar>
-        <x-validation-errors class="mb-4 bg-skyblue-300 px-3 py-2" />
-        <form action="{{ route('update-guru', $guru->slug) }}" method="post" enctype="multipart/form-data"
-            autocomplete="off">
-            @csrf
-            <div class="relative z-0 w-full mb-2 text-center bg-sky-400 py-3">
-                <p class="text-white text-2xl font-bold hover:text-black">
-                    Edit Data Guru
-                </p>
-            </div>
-            <div class="">
-                {{-- NIS --}}
-                <div class="relative z-0 w-full mb-5 group">
-                    <input type="text" name="nuptk" id="nuptk"
-                        class="block py-2.5 px-0 w-full text-sm text-black bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-                        placeholder=" " value="{{ $guru->nuptk }}" />
-                    <label for="nuptk"
-                        class="peer-focus:font-medium absolute pl-1 text-sm text-black duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">
-                        NUPTK
-                    </label>
-                </div>
-            </div>
-
-            <div class="">
-                {{-- NAMA SISWA --}}
-                <div class="relative z-0 w-full mb-5 group">
-                    <input type="text" name="nameGuru" id="nameGuru"
-                        class="block py-2.5 px-0 w-full text-sm text-black bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-                        placeholder=" " value="{{ $guru->nameGuru }}" />
-                    <label for="nameGuru"
-                        class="peer-focus:font-medium pl-1 absolute text-sm text-black duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">
-                        Nama Guru
-                    </label>
-                </div>
-            </div>
-
-            <div class="">
-                {{-- EMAIL SISWA --}}
-                <div class="relative z-0 w-full mb-5 group">
-                    <input type="text" name="email" id="email"
-                        class="block py-2.5 px-0 w-full text-sm text-black bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-                        placeholder=" " value="{{ $guru->email }}" />
-                    <label for="email"
-                        class="peer-focus:font-medium pl-1 absolute text-sm text-black duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">
-                        Email Guru
-                    </label>
-                </div>
-            </div>
-
-            <div class="">
-                {{-- Gender --}}
-                <div class="relative z-0 w-full mb-5 group">
-                    <select id="underline_select" name="gender" id="gender"
-                        class="block py-2.5 px-1 w-full text-sm bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer">
-                        <option value="{{ $guru->gender }}">{{ $guru->gender }} (sekarang)</option>
-                        <option value="Laki-Laki">Laki-Laki</option>
-                        <option value="Perempuan">Perempuan</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="">
-                {{-- Password --}}
-                <div class="relative z-0 w-full mb-5 group">
-                    <input type="text" name="password" id="password"
-                        class="block py-2.5 px-0 w-full text-sm text-black bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-                        placeholder=" " value="" />
-                    <label for="password"
-                        class="peer-focus:font-medium pl-1 absolute text-sm text-black duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">
-                        Password (jika tidak ada perubahan, jangan di isi)
-                    </label>
-                </div>
-            </div>
-
-            {{-- button down --}}
-            <div class="relative mt-5">
+        <div class="max-w-4xl mx-auto space-y-6">
+            <!-- Header & Navigation -->
+            <div class="flex items-center justify-between">
                 <a href="{{ route('data-guru') }}"
-                    class="btn btn-secondary py-1 px-2 bg-red-600 mb-5 mr-2 rounded-lg text-black font-bold hover:text-white hover:bg-red-700">
-                    Back
+                    class="inline-flex items-center space-x-2 px-4 py-2 rounded-xl text-sm font-semibold text-slate-700 bg-white border border-slate-200/80 shadow-sm hover:bg-slate-50 hover:text-indigo-600 transition-all">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    <span>Kembali ke Data Guru</span>
                 </a>
-                <button type="submit"
-                    class="btn btn-secondary py-1 px-2 bg-green-500 mb-5 rounded-lg text-black font-bold hover:text-white hover:bg-green-700">
-                    Save
-                </button>
+                <span class="text-xs font-semibold text-amber-700 bg-amber-50 px-3 py-1 rounded-full border border-amber-200">
+                    Mode Sunting Data Guru
+                </span>
             </div>
-        </form>
 
+            <!-- Form Card -->
+            <div class="bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden">
+                <div class="px-6 sm:px-8 py-6 border-b border-slate-100 bg-slate-50/50">
+                    <h1 class="text-xl sm:text-2xl font-bold text-slate-800">Edit Data Guru</h1>
+                    <p class="text-xs sm:text-sm text-slate-500 mt-1">Perbarui rincian informasi dan status akun untuk {{ $guru->nameGuru }}.</p>
+                </div>
 
+                <div class="p-6 sm:px-8">
+                    <x-validation-errors class="mb-6 p-4 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-700" />
+
+                    <form action="{{ route('update-guru', $guru->slug) }}" method="post" enctype="multipart/form-data" autocomplete="off" class="space-y-6">
+                        @csrf
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            {{-- NUPTK --}}
+                            <div>
+                                <label for="nuptk" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                                    NUPTK <span class="text-rose-500">*</span>
+                                </label>
+                                <input type="text" name="nuptk" id="nuptk" value="{{ $guru->nuptk }}" required
+                                    class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-slate-800 text-sm focus:border-indigo-600 focus:ring-2 focus:ring-indigo-500/20 bg-slate-50/50 focus:bg-white transition-all font-mono" />
+                            </div>
+
+                            {{-- NAMA GURU --}}
+                            <div>
+                                <label for="nameGuru" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                                    Nama Lengkap & Gelar <span class="text-rose-500">*</span>
+                                </label>
+                                <input type="text" name="nameGuru" id="nameGuru" value="{{ $guru->nameGuru }}" required
+                                    class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-slate-800 text-sm focus:border-indigo-600 focus:ring-2 focus:ring-indigo-500/20 bg-slate-50/50 focus:bg-white transition-all" />
+                            </div>
+
+                            {{-- EMAIL --}}
+                            <div>
+                                <label for="email" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                                    Email Guru <span class="text-rose-500">*</span>
+                                </label>
+                                <input type="email" name="email" id="email" value="{{ $guru->email }}" required
+                                    class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-slate-800 text-sm focus:border-indigo-600 focus:ring-2 focus:ring-indigo-500/20 bg-slate-50/50 focus:bg-white transition-all" />
+                            </div>
+
+                            {{-- GENDER --}}
+                            <div>
+                                <label for="gender" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                                    Jenis Kelamin <span class="text-rose-500">*</span>
+                                </label>
+                                <select name="gender" id="gender" required
+                                    class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-slate-800 text-sm focus:border-indigo-600 focus:ring-2 focus:ring-indigo-500/20 bg-slate-50/50 focus:bg-white transition-all">
+                                    <option value="{{ $guru->gender }}">{{ $guru->gender }} (Saat Ini)</option>
+                                    <option value="Laki-Laki">Laki-Laki</option>
+                                    <option value="Perempuan">Perempuan</option>
+                                </select>
+                            </div>
+
+                            {{-- PASSWORD --}}
+                            <div class="md:col-span-2">
+                                <label for="password" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                                    Kata Sandi Baru <span class="text-xs font-normal text-slate-400 normal-case">(kosongkan jika tidak ada perubahan)</span>
+                                </label>
+                                <input type="password" name="password" id="password"
+                                    placeholder="Biarkan kosong jika tidak diubah"
+                                    class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-slate-800 text-sm focus:border-indigo-600 focus:ring-2 focus:ring-indigo-500/20 bg-slate-50/50 focus:bg-white transition-all" />
+                            </div>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="pt-6 border-t border-slate-100 flex items-center justify-end space-x-3">
+                            <a href="{{ route('data-guru') }}"
+                                class="px-5 py-2.5 rounded-xl text-sm font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 hover:text-slate-800 transition-all">
+                                Batal
+                            </a>
+                            <button type="submit"
+                                class="inline-flex items-center space-x-2 px-6 py-2.5 rounded-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] shadow-lg shadow-indigo-600/30 transition-all">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                <span>Simpan Perubahan</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </x-sidebar>
-</main-layout>
+</x-main-layout>

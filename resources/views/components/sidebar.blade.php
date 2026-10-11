@@ -1,149 +1,216 @@
-<!-- component -->
-<div x-data="setup()" x-init="$refs.loading.classList.add('hidden');">
-    <div class="flex h-screen antialiased text-gray-900 bg-gray-100 dark:bg-dark dark:text-light">
-        <!-- Loading screen -->
-        <div x-ref="loading"
-            class="fixed inset-0 z-50 flex items-center justify-center text-2xl font-semibold text-white bg-blue-600">
-            Loading.....
+<!-- Academic Portal Layout & Navigation -->
+<div x-data="{ isSidebarOpen: false }" class="min-h-screen bg-slate-50 flex">
+    <!-- Mobile Backdrop -->
+    <div x-show="isSidebarOpen" 
+         x-transition:enter="transition-opacity ease-linear duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition-opacity ease-linear duration-300"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         @click="isSidebarOpen = false" 
+         class="fixed inset-0 z-40 bg-slate-900/60 backdrop-blur-xs lg:hidden"
+         x-cloak></div>
+
+    <!-- Sidebar (Desktop Fixed & Mobile Slide-over) -->
+    <aside :class="isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
+           class="fixed inset-y-0 left-0 z-50 w-72 bg-slate-900 text-slate-100 flex flex-col transition-transform duration-300 ease-in-out border-r border-slate-800 shadow-2xl lg:shadow-none">
+        
+        <!-- Institution Branding -->
+        <div class="h-20 flex items-center justify-between px-6 border-b border-slate-800/80 bg-slate-950/40">
+            <a href="{{ route('/') }}" class="flex items-center space-x-3 group">
+                <div class="w-10 h-10 rounded-xl bg-white p-1 flex items-center justify-center shadow-md ring-2 ring-indigo-500/30 group-hover:ring-indigo-400 transition">
+                    <img src="{{ asset('Image/Logo/logo-smk.png') }}" class="w-full h-full object-contain" alt="Logo SMK">
+                </div>
+                <div class="flex flex-col">
+                    <span class="text-base font-bold tracking-tight text-white group-hover:text-indigo-300 transition">SMK E-LEARNING</span>
+                    <span class="text-[11px] font-medium uppercase tracking-wider text-indigo-400">Portal Akademik</span>
+                </div>
+            </a>
+            <button @click="isSidebarOpen = false" class="lg:hidden p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
         </div>
 
-        <!-- Sidebar -->
-        <div x-transition:enter="transform transition-transform duration-300" x-transition:enter-start="-translate-x-full"
-            x-transition:enter-end="translate-x-0" x-transition:leave="transform transition-transform duration-300"
-            x-transition:leave-start="translate-x-0" x-transition:leave-end="-translate-x-full" x-show="isSidebarOpen"
-            class="fixed inset-y-0 z-10 flex w-80">
-            <!-- Curvy shape -->
-            <svg class="absolute inset-0 w-full h-full text-white" style="filter: drop-shadow(10px 0 10px #00000030)"
-                preserveAspectRatio="none" viewBox="0 0 309 800" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                <path
-                    d="M268.487 0H0V800H247.32C207.957 725 207.975 492.294 268.487 367.647C329 243 314.906 53.4314 268.487 0Z" />
-            </svg>
-            <!-- Sidebar content -->
-            <div class="z-10 flex flex-col flex-1">
-                <div class="flex items-center justify-between flex-shrink-0 w-64 p-4">
-                    <!-- Logo -->
-                    <a href="/">
-                        <img src="{{ asset('Image/Logo/logo-smk.png') }}" class="w-40 h-full" alt="">
-                    </a>
-                    <!-- Close btn -->
-                    <button @click="isSidebarOpen = false" class="p-1 rounded-lg focus:outline-none focus:ring">
-                        <svg class="w-6 h-6" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                        <span class="sr-only">Close sidebar</span>
-                    </button>
+        <!-- User Profile Pill in Sidebar -->
+        <div class="p-4 mx-4 my-3 rounded-2xl bg-slate-800/60 border border-slate-750/80 flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center text-white font-bold text-sm shadow-inner shrink-0">
+                {{ strtoupper(substr(Auth::user()->name ?? 'U', 0, 1)) }}
+            </div>
+            <div class="min-w-0 flex-1">
+                <p class="text-sm font-semibold text-white truncate">{{ Auth::user()->name }}</p>
+                <div class="flex items-center mt-0.5 space-x-1.5">
+                    <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span class="text-[11px] font-medium text-slate-300 uppercase tracking-wide">
+                        @if(Auth::user()->roles == 'admin') Administrator
+                        @elseif(Auth::user()->roles == 'guru') Guru Pengajar
+                        @elseif(Auth::user()->roles == 'siswa') Siswa Aktif
+                        @else {{ Auth::user()->roles }}
+                        @endif
+                    </span>
                 </div>
-                <nav class="flex flex-col flex-1 w-64 p-4 mt-4">
-                    {{-- home --}}
-                    <a href="{{ route('/') }}" class="flex items-center space-x-2 hover:text-blue-600">
-                        <svg class="w-6 h-6" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+            </div>
+        </div>
+
+        <!-- Navigation Links -->
+        <nav class="flex-1 px-4 py-2 space-y-6 overflow-y-auto">
+            <!-- Group: Utama -->
+            <div>
+                <p class="px-3 text-[11px] font-semibold tracking-wider text-slate-400 uppercase mb-2">Menu Utama</p>
+                <div class="space-y-1">
+                    <a href="{{ route('/') }}" 
+                       class="flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium transition {{ request()->routeIs('/') ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30' : 'text-slate-300 hover:bg-slate-800/70 hover:text-white' }}">
+                        <svg class="w-5 h-5 shrink-0 opacity-80" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                         </svg>
-                        <span>Home</span>
+                        <span>Dashboard</span>
                     </a>
 
                     @if (Auth::user()->roles == 'guru' || Auth::user()->roles == 'siswa')
-                        {{-- Profile --}}
-                        <a href="{{ route('profile') }}" class="flex items-center space-x-2 mt-3 hover:text-blue-600">
-                            <img src="{{ asset('Image/Icon/profile.png') }}" class="w-6" alt="">
-                            <span>Profile</span>
-                        </a>
+                    <a href="{{ route('elearning') }}" 
+                       class="flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium transition {{ request()->routeIs('elearning*') ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30' : 'text-slate-300 hover:bg-slate-800/70 hover:text-white' }}">
+                        <svg class="w-5 h-5 shrink-0 opacity-80" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                        </svg>
+                        <span>Kelas E-Learning</span>
+                    </a>
                     @endif
 
-                    {{-- Jadwal Pelajaran --}}
-                    <a href="{{ route('jadwal-mapel') }}" class="flex items-center space-x-2 mt-3 hover:text-blue-600">
-                        <img src="{{ asset('Image/Icon/schedule.png') }}" class="w-6" alt="">
+                    <a href="{{ route('jadwal-mapel') }}" 
+                       class="flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium transition {{ request()->routeIs('jadwal-mapel*') ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30' : 'text-slate-300 hover:bg-slate-800/70 hover:text-white' }}">
+                        <svg class="w-5 h-5 shrink-0 opacity-80" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
                         <span>Jadwal Pelajaran</span>
                     </a>
 
-                    @if (Auth::user()->roles == 'admin')
-                        {{-- Data Guru --}}
-                        <a href="{{ route('data-guru') }}" class="flex items-center space-x-2 mt-3 hover:text-blue-600">
-                            <img src="{{ asset('Image/Icon/school.png') }}" class="w-6" alt="">
-                            <span>Data Guru</span>
-                        </a>
-
-                        {{-- Data Siswa --}}
-                        <a href="{{ route('data-siswa') }}"
-                            class="flex items-center space-x-2 mt-3 hover:text-blue-600">
-                            <img src="{{ asset('Image/Icon/study.png') }}" class="w-6" alt="">
-                            <span>Data Siswa</span>
-                        </a>
-
-                        {{-- Data Walikelas --}}
-                        <a href="{{ route('data-walikelas') }}"
-                            class="flex items-center space-x-2 mt-3 hover:text-blue-600">
-                            <img src="{{ asset('Image/Icon/school.png') }}" class="w-6" alt="">
-                            <span>Data Walikelas</span>
-                        </a>
-
-                        {{-- Mapel --}}
-                        <a href="{{ route('mapel') }}" class="flex items-center space-x-2 mt-3 hover:text-blue-600">
-                            <img src="{{ asset('Image/Icon/books.png') }}" class="w-6" alt="">
-                            <span>Mata Pelajaran</span>
-                        </a>
-                    @endif
-
                     @if (Auth::user()->roles == 'guru' || Auth::user()->roles == 'siswa')
-                        {{-- E-Learning --}}
-                        <a href="{{ route('elearning') }}"
-                            class="flex items-center space-x-2 mt-3 hover:text-blue-600">
-                            <img src="{{ asset('Image/Icon/elearning.png') }}" class="w-6" alt="">
-                            <span>E-Learning</span>
-                        </a>
+                    <a href="{{ route('profile') }}" 
+                       class="flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium transition {{ request()->routeIs('profile*') ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30' : 'text-slate-300 hover:bg-slate-800/70 hover:text-white' }}">
+                        <svg class="w-5 h-5 shrink-0 opacity-80" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                        <span>Profil Pengguna</span>
+                    </a>
                     @endif
+                </div>
+            </div>
 
-                    <a href="#" class="flex items-center space-x-2 mt-3 hover:text-blue-600" target="_blank">
-                        <img src="{{ asset('Image/Icon/info.png') }}" class="w-6" alt="">
+            <!-- Group: Master Data (Admin Only) -->
+            @if (Auth::user()->roles == 'admin')
+            <div>
+                <p class="px-3 text-[11px] font-semibold tracking-wider text-slate-400 uppercase mb-2">Manajemen Data</p>
+                <div class="space-y-1">
+                    <a href="{{ route('data-siswa') }}" 
+                       class="flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium transition {{ request()->routeIs('data-siswa*', 'show-siswa*', 'tambah-siswa*', 'edit-siswa*') ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30' : 'text-slate-300 hover:bg-slate-800/70 hover:text-white' }}">
+                        <svg class="w-5 h-5 shrink-0 opacity-80" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                        <span>Data Siswa</span>
+                    </a>
+
+                    <a href="{{ route('data-guru') }}" 
+                       class="flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium transition {{ request()->routeIs('data-guru*', 'tambah-guru*', 'edit-guru*') ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30' : 'text-slate-300 hover:bg-slate-800/70 hover:text-white' }}">
+                        <svg class="w-5 h-5 shrink-0 opacity-80" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+                        </svg>
+                        <span>Data Guru</span>
+                    </a>
+
+                    <a href="{{ route('data-walikelas') }}" 
+                       class="flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium transition {{ request()->routeIs('data-walikelas*', 'tambahwalkel*', 'edit-walkel*') ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30' : 'text-slate-300 hover:bg-slate-800/70 hover:text-white' }}">
+                        <svg class="w-5 h-5 shrink-0 opacity-80" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />
+                        </svg>
+                        <span>Data Wali Kelas</span>
+                    </a>
+
+                    <a href="{{ route('mapel') }}" 
+                       class="flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium transition {{ request()->routeIs('mapel*', 'tambah-mapel*', 'edit-mapel*') ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30' : 'text-slate-300 hover:bg-slate-800/70 hover:text-white' }}">
+                        <svg class="w-5 h-5 shrink-0 opacity-80" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                        </svg>
+                        <span>Mata Pelajaran</span>
+                    </a>
+                </div>
+            </div>
+            @endif
+
+            <!-- Group: Informasi -->
+            <div>
+                <p class="px-3 text-[11px] font-semibold tracking-wider text-slate-400 uppercase mb-2">Informasi</p>
+                <div class="space-y-1">
+                    <a href="#" class="flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800/70 hover:text-white transition">
+                        <svg class="w-5 h-5 shrink-0 opacity-80" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
                         <span>Tentang Sekolah</span>
                     </a>
-                </nav>
-                <form method="POST" action="{{ route('logout') }}" x-data>
-                    @csrf
-                    <button type="submit"
-                        class="block w-56 ps-3 pe-4 py-2 border-l-4 border-transparent
-                            text-start text-base font-medium text-black hover:border-sky-300 dark:hover:border-sky-600
-                            focus:outline-none focus:text-gray-800 dark:focus:text-gray-200 focus:border-gray-300
-                            dark:focus:border-gray-600 transition duration-150 ease-in-out">
-                        <div class="flex items-center space-x-2">
-                            <svg aria-hidden="true" class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                            </svg>
-                            <span>{{ __('Log Out') }}</span>
-                        </div>
-                    </button>
-                </form>
+                </div>
             </div>
+        </nav>
+
+        <!-- Sidebar Footer / Logout -->
+        <div class="p-4 border-t border-slate-800/80 bg-slate-950/30">
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" 
+                        class="w-full flex items-center justify-center space-x-2.5 px-4 py-2.5 rounded-xl text-sm font-medium text-rose-300 hover:text-rose-100 hover:bg-rose-950/40 border border-rose-900/40 hover:border-rose-800/60 transition group">
+                    <svg class="w-4 h-4 text-rose-400 group-hover:text-rose-200 transition" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                    <span>Keluar Akun</span>
+                </button>
+            </form>
+            <p class="text-[11px] text-center text-slate-400 mt-2.5 font-medium">SMK Academic LMS • 2024/2025</p>
         </div>
-        <main class="flex flex-col flex-1">
-            <!-- Page content -->
-            <button @click="isSidebarOpen = true" class="fixed p-2 text-white bg-black rounded-lg top-5 left-5">
-                <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                    stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-                <span class="sr-only">Open menu</span>
-            </button>
-            <h1 class="sr-only">Home</h1>
-            <div class="pt-20 px-5 md:px-18 h-full bg-white">
-                {{ $slot }}
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="flex-1 lg:pl-72 flex flex-col min-h-screen">
+        <!-- Top Navbar -->
+        <header class="sticky top-0 z-30 h-16 bg-white/90 backdrop-blur-md border-b border-slate-200/80 flex items-center justify-between px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center space-x-3">
+                <!-- Hamburger Button (Mobile) -->
+                <button @click="isSidebarOpen = true" 
+                        class="lg:hidden p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition">
+                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                    <span class="sr-only">Buka menu</span>
+                </button>
+
+                <!-- Academic Semester Indicator -->
+                <div class="hidden sm:flex items-center space-x-2 px-3 py-1.5 rounded-full bg-slate-100 text-slate-700 text-xs font-semibold">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                    <span>T.A. 2024/2025 • Semester Ganjil</span>
+                </div>
             </div>
+
+            <!-- Right Navbar Utilities -->
+            <div class="flex items-center space-x-3 sm:space-x-4">
+                <div class="text-right hidden sm:block">
+                    <p class="text-xs font-bold text-slate-800 leading-tight">{{ Auth::user()->name }}</p>
+                    <p class="text-[11px] text-slate-500 capitalize leading-tight">
+                        @if(Auth::user()->roles == 'admin') Administrator
+                        @elseif(Auth::user()->roles == 'guru') Guru Pengajar
+                        @elseif(Auth::user()->roles == 'siswa') Siswa
+                        @else {{ Auth::user()->roles }}
+                        @endif
+                    </p>
+                </div>
+
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-blue-500 text-white font-bold text-sm flex items-center justify-center shadow-sm">
+                    {{ strtoupper(substr(Auth::user()->name ?? 'U', 0, 1)) }}
+                </div>
+            </div>
+        </header>
+
+        <!-- Main View Slot -->
+        <main class="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">
+            {{ $slot }}
         </main>
     </div>
 </div>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/2.8.1/alpine.js"></script>
-<script>
-    const setup = () => {
-        return {
-            isSidebarOpen: false,
-        }
-    }
-</script>
