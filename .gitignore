@@ -20,7 +20,6 @@ auth.json
 /.nova
 /.vscode
 /.zed
-/database/seeders
 /public/Image/Logo/logo-smk1.png
 app.zip
 resources.zip
