@@ -18,22 +18,22 @@ class ElearningSeeder extends Seeder
             [
                 'kode_mapel' => 'MPL-TKJ-101',
                 'pertemuan' => 1,
-                'materi' => null,
+                'materi' => 'modul-dasar-pemrograman-web-p1.pdf',
             ],
             [
                 'kode_mapel' => 'MPL-TKJ-101',
                 'pertemuan' => 2,
-                'materi' => null,
+                'materi' => 'modul-html-css-modern-p2.pdf',
             ],
             [
                 'kode_mapel' => 'MPL-TKJ-102',
                 'pertemuan' => 1,
-                'materi' => null,
+                'materi' => 'modul-infrastruktur-jaringan-p1.pdf',
             ],
             [
                 'kode_mapel' => 'MPL-TBSM-201',
                 'pertemuan' => 1,
-                'materi' => null,
+                'materi' => 'modul-pemeliharaan-mesin-p1.pdf',
             ],
         ];
 
@@ -43,7 +43,7 @@ class ElearningSeeder extends Seeder
                 elearning::updateOrCreate(
                     [
                         'kode_mapel' => $item['kode_mapel'],
-                        'pertemuan' => $item['pertemuan'],
+                        'pertemuan' => (string)$item['pertemuan'],
                     ],
                     [
                         'name_mapel' => $mapel->name_mapel,
