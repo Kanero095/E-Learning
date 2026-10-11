@@ -36,25 +36,34 @@ class FortifyServiceProvider extends ServiceProvider
         Fortify::resetUserPasswordsUsing(ResetUserPassword::class);
 
         Fortify::authenticateUsing(function (Request $request) {
-            $login = $request->email; // tetap pakai name="email" di form
+            $login = $request->email; // Field name pada form login (bisa berisi Email, NIS, atau NUPTK)
             $password = $request->password;
 
-            // $user = User::where('email', $login)
-            //     ->orWhere('nis', $login)
-            //     ->orWhere('nupt', $login)
-            //     ->first();
-
             $user = null;
-            if (User::where('email', $login)->exists()) {
-                $user = User::where('email', $login)->first();
-            } elseif (User::where('nis', $login)->exists()) {
-                $emailSiswa = User::where('nis', $login)->first();
-                $user = $emailSiswa ? User::where('email', $emailSiswa->email)->first() : null;
-            } elseif (User::where('nuptk', $login)->exists()) {
-                $emailGuru = User::where('nuptk', $login)->first();
-                $user = $emailGuru ? User::where('email', $emailGuru->email)->first() : null;
+
+            // 1. Cek langsung di tabel User berdasarkan Email, NIS, atau NUPTK
+            $user = User::where('email', $login)
+                ->orWhere('nis', $login)
+                ->orWhere('nuptk', $login)
+                ->first();
+
+            // 2. Jika belum ditemukan, periksa relasi ke tabel Siswa berdasarkan NIS
+            if (!$user) {
+                $siswa = \App\Models\siswa::where('nis', $login)->first();
+                if ($siswa) {
+                    $user = User::where('email', $siswa->email)->first();
+                }
             }
 
+            // 3. Jika belum ditemukan, periksa relasi ke tabel Guru berdasarkan NUPTK
+            if (!$user) {
+                $guru = \App\Models\guru::where('nuptk', $login)->first();
+                if ($guru) {
+                    $user = User::where('email', $guru->email)->first();
+                }
+            }
+
+            // 4. Verifikasi kecocokan password jika user ditemukan
             if ($user && Hash::check($password, $user->password)) {
                 return $user;
             }
