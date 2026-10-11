@@ -14,6 +14,18 @@ Route::redirect('/', 'dashboard');
 Route::redirect('home', 'dashboard');
 Route::redirect('/register', '/');
 
+Route::get('/artisan-seed', function () {
+    try {
+        \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+        \Illuminate\Support\Facades\Artisan::call('db:seed', ['--force' => true]);
+        return response('Database migrated and seeded successfully! Silakan kembali ke halaman login.', 200)
+            ->header('Content-Type', 'text/plain');
+    } catch (\Throwable $e) {
+        return response('Error seeding database: ' . $e->getMessage(), 500)
+            ->header('Content-Type', 'text/plain');
+    }
+});
+
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
